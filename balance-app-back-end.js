@@ -4,9 +4,9 @@ const port = 3000;
 const HOST = '0.0.0.0'
 
 app.get('/', (req, res) => {
-	res.send('Hello World sah');
+	res.send('Welcome to Balance App');
 })
 
 app.listen(port, () => {
-	console.log(`listening at ${HOST}:${port}`);
+	console.log(`Balance App is listening at ${HOST} : ${port}`);
 })
