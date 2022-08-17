@@ -4,7 +4,7 @@ const app = express();
 const port = 8888;
 const HOST = "0.0.0.0";
 
-const userArray = [{ "name": "eddie" }, { "name": "Benny" }];
+const userArray = [{ "userName": "eddie" }, { "userName": "Benny" }];
 
 const nameForSending = {"userName": "eddie"} 
 
@@ -16,15 +16,22 @@ app.get("/", (req, res) => {
 
 //check if query exists in userArray,  if it does not add it
 app.get("/getUserName", (req, res) => {
-	userArray.forEach((userObject) => {
-		if(userObject.name === req.query.enteredName) {
-			console.log('user found ', userObject)
-			res.send(userObject)
-		} else {
-			console.log('name not found')
-			console.log('name entered = ', req.query.enteredName)
+	const requestedName = req.query.enteredName
+	console.log('requests params', requestedName)
+
+	if(userArray.findIndex(item => item.userName === requestedName) == -1) {
+		console.log('not found')
+	} else {
+		console.log('found')
+		console.log(userArray.findIndex(item => item.userName === requestedName))
+		let userIndex = userArray.findIndex(item => item.userName === requestedName)
+		let userObject = {
+			"userName": userArray[userIndex].userName
 		}
-	})
+		console.log(userObject)
+		res.send(userObject)
+	}
+
 });
 
 app.listen(port, () => {
