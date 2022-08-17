@@ -20,7 +20,11 @@ app.get("/getUserName", (req, res) => {
 	console.log('requests params', requestedName)
 
 	if(userArray.findIndex(item => item.userName === requestedName) == -1) {
-		console.log('not found')
+		console.log('not found creating new profile for', requestedName)
+		const jsonRequstedName = `"${requestedName}"`
+		userArray.push({"userName": requestedName})
+		const newUser = userArray[userArray.length - 1]
+		res.send(newUser)
 	} else {
 		console.log('found')
 		console.log(userArray.findIndex(item => item.userName === requestedName))
@@ -31,7 +35,7 @@ app.get("/getUserName", (req, res) => {
 		console.log(userObject)
 		res.send(userObject)
 	}
-
+	console.log(userArray)
 });
 
 app.listen(port, () => {
