@@ -21,7 +21,8 @@ app.get("/getUserName", (req, res) => {
 			console.log('user found ', userObject)
 			res.send(userObject)
 		} else {
-			console.log('name not found', req.query.enteredName)
+			console.log('name not found')
+			console.log('name entered = ', req.query.enteredName)
 		}
 	})
 });
