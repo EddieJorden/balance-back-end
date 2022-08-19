@@ -12,27 +12,23 @@ app.get("/", (req, res) => {
   res.send("Welcome to Balance App");
 });
 
-//check if query exists in userArray,  and returns or creates new user and returns
+//If name exists in users returns user profile else craetes new user and returns user profile.
 app.get("/getUserProfile", (req, res) => {
 	const requestedName = req.query.enteredProfileName
 	const requestedEmail = req.query.enteredProfileEmail
-	console.log('requests params name ', requestedName)
-	console.log('requests params email ', requestedEmail)
+	console.log({requestedName})
+	console.log({requestedEmail})
 
 	if(userArray.findIndex(item => item.userName === requestedName) == -1) {
-		console.log('not found creating new profile for', requestedName)
-		const jsonRequstedName = `"${requestedName}"`
+		console.log(`user name: ${requestedName} not found creating new profile for user name: `, requestedName)
 		userArray.push({"userName": requestedName, "userEmail": requestedEmail})
 		const newUser = userArray[userArray.length - 1]
 		res.send(newUser)
 	} else {
-		console.log('found')
-		console.log(userArray.findIndex(item => item.userName === requestedName))
+		console.log(`${requestedName} found`)
 		let userIndex = userArray.findIndex(item => item.userName === requestedName)
-		let userObject = {
-			"userName": userArray[userIndex].userName
-		}
-		console.log(userObject)
+		let userObject = userArray[userIndex]
+		console.log('sending', userObject)
 		res.send(userObject)
 	}
 	console.log(userArray)
