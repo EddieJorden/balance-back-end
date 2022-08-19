@@ -19,8 +19,10 @@ app.get("/getUserProfile", (req, res) => {
 	console.log({requestedName})
 	console.log({requestedEmail})
 
-	if(userArray.findIndex(item => item.userName === requestedName) == -1) {
-		console.log(`user name: ${requestedName} not found creating new profile for user name: `, requestedName)
+	//if not found create new profile
+	if(userArray.findIndex(item => item.userName === requestedName && item.userEmail === requestedEmail) == -1) {
+		console.log(`user name: ${requestedName} not found`)
+		console.log(`creating new profile for user name: ${requestedName}`)
 		userArray.push({"userName": requestedName, "userEmail": requestedEmail})
 		const newUser = userArray[userArray.length - 1]
 		res.send(newUser)
@@ -28,10 +30,10 @@ app.get("/getUserProfile", (req, res) => {
 		console.log(`${requestedName} found`)
 		let userIndex = userArray.findIndex(item => item.userName === requestedName)
 		let userObject = userArray[userIndex]
-		console.log('sending', userObject)
+		console.log('sending...', userObject)
 		res.send(userObject)
 	}
-	console.log(userArray)
+	console.log(`user array: `, userArray)
 });
 
 app.listen(port, () => {
