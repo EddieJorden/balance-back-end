@@ -6,6 +6,8 @@ const HOST = "0.0.0.0";
 
 const userArray = [];
 
+
+
 app.use(cors());
 
 app.get("/", (req, res) => {
@@ -19,21 +21,46 @@ app.get("/getUserProfile", (req, res) => {
 	console.log({requestedName})
 	console.log({requestedEmail})
 
-	//if not found create new profile
-	if(userArray.findIndex(item => item.userName === requestedName && item.userEmail === requestedEmail) == -1) {
-		console.log(`user name: ${requestedName} not found`)
-		console.log(`creating new profile for user name: ${requestedName}`)
+	const isValidName = (name) => {
+		if(requestedName.length < 60 &&
+					requestedEmail.length < 60){
+						return true
+					} else return false
+	}
+
+	const isValidEmail = (email) => {
+		if(/^[a-z0-9][a-z0-9-_\.]+@([a-z]|[a-z0-9]?[a-z0-9-]+[a-z0-9])\.[a-z0-9]{2,10}(?:\.[a-z]{2,10})?$/.test(email)) {
+					console.log(`${email} passed`);
+					return true;
+		} else {
+			console.log('email did not pass');
+			return false;
+		}
+	}
+	const isNameValid = isValidName(requestedName)
+
+	const isEmailValid = isValidEmail(requestedEmail)
+
+	if(isNameValid && isEmailValid) {
+			//if not found create new profile
+	if(userArray.findIndex(item => 
+		item.userName.toUpperCase() === requestedName.toUpperCase() &&
+		item.userEmail.toUpperCase() === requestedEmail.toUpperCase()) == -1
+) {
+		console.log(`user name: ${requestedName} or email: ${requestedEmail} not found`)
+		console.log(`CREATING NEW PROFILE! user name: ${requestedName}, email: ${requestedEmail}`)
 		userArray.push({"userName": requestedName, "userEmail": requestedEmail})
 		const newUser = userArray[userArray.length - 1]
 		res.send(newUser)
-	} else {
-		console.log(`${requestedName} found`)
-		let userIndex = userArray.findIndex(item => item.userName === requestedName)
-		let userObject = userArray[userIndex]
-		console.log('sending...', userObject)
-		res.send(userObject)
+		} else {
+			console.log(`${requestedName} found`)
+			let userIndex = userArray.findIndex(item => item.userName === requestedName)
+			let userObject = userArray[userIndex]
+			console.log('sending...', userObject)
+			res.send(userObject)
+		}
 	}
-	console.log(`user array: `, userArray)
+			console.log(`USER ARRAY: `, userArray)
 });
 
 app.listen(port, () => {
