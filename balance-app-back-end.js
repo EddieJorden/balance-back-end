@@ -1,12 +1,10 @@
 const express = require("express");
 const cors = require("cors");
+
 const app = express();
 const port = 8888;
 const HOST = "0.0.0.0";
-
 const userArray = [];
-
-
 
 app.use(cors());
 
@@ -24,6 +22,7 @@ app.get("/getUserProfile", (req, res) => {
 	const isValidName = (name) => {
 		if(requestedName.length < 60 &&
 					requestedEmail.length < 60){
+						console.log(`${name} passed`)
 						return true
 					} else return false
 	}
@@ -49,15 +48,24 @@ app.get("/getUserProfile", (req, res) => {
 ) {
 		console.log(`user name: ${requestedName} or email: ${requestedEmail} not found`)
 		console.log(`CREATING NEW PROFILE! user name: ${requestedName}, email: ${requestedEmail}`)
-		userArray.push({"userName": requestedName, "userEmail": requestedEmail})
-		const newUser = userArray[userArray.length - 1]
+		const newUser = {
+			userName: requestedName,
+			userEmail: requestedEmail,
+			userStatus: 'new user'
+		}
+		userArray.push(newUser)
 		res.send(newUser)
 		} else {
 			console.log(`${requestedName} found`)
 			let userIndex = userArray.findIndex(item => item.userName === requestedName)
 			let userObject = userArray[userIndex]
 			console.log('sending...', userObject)
-			res.send(userObject)
+			const existingUser = {
+				userName: userArray[userIndex].userName,
+				userEmail: userArray[userIndex].userEmail,
+				userStatus: 'existing user'
+			}
+			res.send(existingUser)
 		}
 	}
 			console.log(`USER ARRAY: `, userArray)
