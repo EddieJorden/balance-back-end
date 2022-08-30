@@ -40,8 +40,10 @@ app.get("/getUserProfile", (req, res) => {
 
 	const isEmailValid = isValidEmail(requestedEmail)
 
-	if(isNameValid && isEmailValid) {
+	if(isNameValid && isEmailValid && requestedName !== "user name" && requestedEmail !== "mail@email.com") {
 			//if not found create new profile
+		// userArray.filter(profile => profile.userName === requestedName)
+
 	if(userArray.findIndex(item => 
 		item.userName.toUpperCase() === requestedName.toUpperCase() &&
 		item.userEmail.toUpperCase() === requestedEmail.toUpperCase()) == -1
