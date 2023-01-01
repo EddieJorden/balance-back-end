@@ -1,16 +1,40 @@
 const express = require("express");
 const cors = require("cors");
+const pool = require("./database")
 
 const app = express();
 const port = 8888;
 const HOST = "0.0.0.0";
+
 const userArray = [];
 
 app.use(cors());
+app.use(express.json())
 
 app.get("/", (req, res) => {
   res.send("Welcome to Balance App");
 });
+
+//get a user 
+
+//create a user
+app.post("/user", async(req, res) => {
+	try {
+		const { userName } = req.body;
+		const newUser = await pool.query("INSERT INTO userProfile (description) VALUES ($1) RETURNING *",
+		[userName]
+		);
+		res.json(newUser)
+	} catch (err) {
+		console.error({error: err.message})
+	}
+})
+
+//update user
+
+//delete user
+
+
 
 //If name exists in users returns user profile else craetes new user and returns user profile.
 app.get("/getUserProfile", (req, res) => {
@@ -53,6 +77,7 @@ app.get("/getUserProfile", (req, res) => {
 		const newUser = {
 			userName: requestedName,
 			userEmail: requestedEmail,
+			userTasks: [],
 			userStatus: 'new user'
 		}
 		userArray.push(newUser)
@@ -65,13 +90,34 @@ app.get("/getUserProfile", (req, res) => {
 			const existingUser = {
 				userName: userArray[userIndex].userName,
 				userEmail: userArray[userIndex].userEmail,
-				userStatus: 'existing user'
+				userStatus: 'existing user',
+				userTasks: 'test task'
 			}
 			res.send(existingUser)
 		}
 	}
 			console.log(`USER ARRAY: `, userArray)
 });
+
+app.post('/createNewTask', (req, res) => {
+	// find user
+	console.log('req.query', req.query)
+	const userName = req.query.enteredProfileName;
+	console.log('userName', userName)
+	const userEmail = req.query.enteredProfileEmail;
+	console.log('userEmail', userEmail)
+	userArray.forEach(user => {
+		if(user.userName === userName && user.userEmail === userEmail) {
+			user.userTasks.push(req.query.enteredTask)
+			console.log('user name and email match')
+			res.send(user) 
+		} else {
+	// 		console.log('unable to add task')
+			res.send('unable to find user')
+		}
+	})
+	// add task to user object
+})
 
 app.listen(port, () => {
   console.log(`Balance App is listening at ${HOST} : ${port}`);

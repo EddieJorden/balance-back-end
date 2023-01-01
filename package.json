@@ -4,6 +4,13 @@
     "express": "^4.18.1",
     "nodemon": "^2.0.19",
     "npm": "^8.16.0",
+    "pg": "^8.8.0",
     "yarn": "^1.22.19"
-  }
+  },
+  "name": "balance-app-back-end",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/EddieJorden/balance-back-end.git",
+  "author": "EddieJorden <eddie@eddiejorden.tech>",
+  "license": "MIT"
 }
