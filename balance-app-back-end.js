@@ -52,7 +52,7 @@ app.get("/getUserProfile", (req, res) => {
 	}
 
 	const isValidEmail = (email) => {
-		if(/^[a-z0-9][a-z0-9-_\.]+@([a-z]|[a-z0-9]?[a-z0-9-]+[a-z0-9])\.[a-z0-9]{2,10}(?:\.[a-z]{2,10})?$/.test(email)) {
+		if(/^[a-z0-9][a-z0-9-_\.]+@([a-z]|[a-z0-9]?[a-z0-9-]+[a-z0-9])\.[a-z0-9]{2,10}(?:\.[a-z]{2,10})?$/i.test(email)) {
 					console.log(`${email} passed`);
 					return true;
 		} else {
