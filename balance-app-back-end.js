@@ -91,7 +91,7 @@ app.get("/getUserProfile", (req, res) => {
 				userName: userArray[userIndex].userName,
 				userEmail: userArray[userIndex].userEmail,
 				userStatus: 'existing user',
-				userTasks: 'test task'
+				userTasks: userArray[userIndex].userTasks
 			}
 			res.send(existingUser)
 		}
@@ -99,18 +99,21 @@ app.get("/getUserProfile", (req, res) => {
 			console.log(`USER ARRAY: `, userArray)
 });
 
+
+
 app.post('/createNewTask', (req, res) => {
 	// find user
 	console.log('req.query', req.query)
-	console.log('userArray', userArray)
 	const userName = req.query.enteredProfileName;
 	const userEmail = req.query.enteredProfileEmail;
 	const enteredTask = req.query.enteredTask
+	if(userArray.length === 0) res.send('user not found')
 	if(userArray.length > 0) {
 		userArray.forEach(user => {
 			if(user.userName === userName && user.userEmail === userEmail) {
 				console.log('user name and email match! new task added')
 				user.userTasks.push(enteredTask)
+				console.log('user', user)
 				res.send(user)
 			} else {
 				console.log('user name or email do not match! unable to add task')
@@ -118,7 +121,7 @@ app.post('/createNewTask', (req, res) => {
 			}
 		})
 	} else {
-		res.send('user not found')
+		// res.send('user not found')
 	}
 })
 
