@@ -5,6 +5,7 @@
     "nodemon": "^2.0.19",
     "npm": "^8.16.0",
     "pg": "^8.8.0",
+    "request": "^2.88.2",
     "yarn": "^1.22.19"
   },
   "name": "balance-app-back-end",
