@@ -145,7 +145,9 @@ app.get('/fetch-chatgpt-response', (req, res) => {
 			model: "text-davinci-003"
     },
     headers: {
+
       'Authorization': 'Bearer ' + apiKey
+
     }
   }, (error, response, body) => {
     if (error) {
