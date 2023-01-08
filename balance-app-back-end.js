@@ -123,10 +123,7 @@ app.post('/createNewTask', (req, res) => {
 	}
 })
 
-// const express = require('express');
 const request = require('request');
-
-// const app = express();
 
 app.get('/fetch-chatgpt-response', (req, res) => {
   // Get the prompt from the query parameters
@@ -134,14 +131,15 @@ app.get('/fetch-chatgpt-response', (req, res) => {
 	console.log(prompt)
 
   // Make a request to the chatgpt endpoint with the prompt
-	https://api.openai.com/v1/completions
+	const apiKey = process.env.API_KEY;
+
   request.post('https://api.openai.com/v1/completions', {
     json: {
       prompt: prompt,
 			model: "text-davinci-003"
     },
     headers: {
-      'Authorization': 'Bearer ' + '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'
+      'Authorization': 'Bearer ' + apiKey
     }
   }, (error, response, body) => {
     if (error) {
