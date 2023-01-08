@@ -141,7 +141,7 @@ app.get('/fetch-chatgpt-response', (req, res) => {
 			model: "text-davinci-003"
     },
     headers: {
-      'Authorization': 'Bearer ' + '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'
+      'Authorization': 'Bearer ' + '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'
     }
   }, (error, response, body) => {
     if (error) {
