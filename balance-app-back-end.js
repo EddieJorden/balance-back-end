@@ -17,9 +17,6 @@ app.get("/", (req, res) => {
   res.send("Welcome to Balance App");
 });
 
-//get a user 
-
-//create a user
 app.post("/user", async(req, res) => {
 	try {
 		const { userName } = req.body;
@@ -31,10 +28,6 @@ app.post("/user", async(req, res) => {
 		console.error({error: err.message})
 	}
 })
-
-//update user
-
-//delete user
 
 //If name exists in users returns user profile else craetes new user and returns user profile.
 app.get("/getUserProfile", (req, res) => {
@@ -66,7 +59,6 @@ app.get("/getUserProfile", (req, res) => {
 
 	if(isNameValid && isEmailValid && requestedName !== "user name" && requestedEmail !== "mail@email.com") {
 			//if not found create new profile
-		// userArray.filter(profile => profile.userName === requestedName)
 
 	if(userArray.findIndex(item => 
 		item.userName.toUpperCase() === requestedName.toUpperCase() &&
@@ -120,15 +112,11 @@ app.post('/createNewTask', (req, res) => {
 				res.send('user not found')
 			}
 		})
-	} else {
-		// res.send('user not found')
 	}
 })
 
 // const express = require('express');
 const request = require('request');
-
-// const app = express();
 
 app.get('/fetch-chatgpt-response', (req, res) => {
   // Get the prompt from the query parameters
@@ -136,18 +124,14 @@ app.get('/fetch-chatgpt-response', (req, res) => {
 	const apiKey = process.env.API_KEY;
 
 	console.log(prompt)
-
   // Make a request to the chatgpt endpoint with the prompt
-	https://api.openai.com/v1/completions
   request.post('https://api.openai.com/v1/completions', {
     json: {
       prompt: prompt,
 			model: "text-davinci-003"
     },
     headers: {
-
       'Authorization': 'Bearer ' + apiKey
-
     }
   }, (error, response, body) => {
     if (error) {
@@ -161,11 +145,6 @@ app.get('/fetch-chatgpt-response', (req, res) => {
     }
   });
 });
-
-// app.listen(3000, () => {
-//   console.log('Server listening on port 3000');
-// });
-
 
 app.listen(port, () => {
   console.log(`Balance App is listening at ${HOST} : ${port}`);
