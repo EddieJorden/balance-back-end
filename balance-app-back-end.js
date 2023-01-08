@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const pool = require("./database")
+require('dotenv').config();
+
 
 const app = express();
 const port = 8888;
@@ -131,6 +133,8 @@ const request = require('request');
 app.get('/fetch-chatgpt-response', (req, res) => {
   // Get the prompt from the query parameters
   const prompt = req.query.prompt;
+	const apiKey = process.env.API_KEY;
+
 	console.log(prompt)
 
   // Make a request to the chatgpt endpoint with the prompt
@@ -141,7 +145,9 @@ app.get('/fetch-chatgpt-response', (req, res) => {
 			model: "text-davinci-003"
     },
     headers: {
-      'Authorization': 'Bearer ' + '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'
+
+      'Authorization': 'Bearer ' + apiKey
+
     }
   }, (error, response, body) => {
     if (error) {
