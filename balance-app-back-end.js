@@ -128,7 +128,8 @@ app.get('/fetch-chatgpt-response', (req, res) => {
   request.post('https://api.openai.com/v1/completions', {
     json: {
       prompt: prompt,
-			model: "text-davinci-003"
+			model: "text-davinci-003",
+			max_tokens: 2048
     },
     headers: {
       'Authorization': 'Bearer ' + apiKey
@@ -139,8 +140,8 @@ app.get('/fetch-chatgpt-response', (req, res) => {
       // Return an error response if there was a problem with the request
       res.status(500).send({ error: error });
     } else {
-			console.log('Response:', response);
       // Return the response from chatgpt
+			console.log('body', body)
       res.send(body);
     }
   });
