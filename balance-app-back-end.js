@@ -51,12 +51,13 @@ app.post("/adduser", (req, res) => {
   db.query(addUserQuery, [username, email, email], (error, result) => {
     if (error) throw error;
     if (result.affectedRows > 0) {
-      res.send("User added successfully");
+      res.send({message: "User added successfully", user: {username, email}});
     } else {
-      res.send("User already exists");
+      res.send({message: "User already exists", user: {username, email}});
     }
   });
 });
+
 
 
 
