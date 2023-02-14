@@ -35,22 +35,30 @@ db.connect((err) => {
 	}
 	console.log("database connected.")
 })
+
 app.post("/adduser", (req, res) => {
-	console.log(req.body)
+  console.log(req.body)
   const username = req.body.username;
   const email = req.body.email;
   const addUserQuery = `
     INSERT INTO users (username, email)
-    VALUES ('${username}', '${email}');
+    SELECT * FROM (SELECT ?, ?) AS tmp
+    WHERE NOT EXISTS (
+        SELECT email FROM users WHERE email = ?
+    ) LIMIT 1;
   `;
 
-  db.query(addUserQuery, (error) => {
+  db.query(addUserQuery, [username, email, email], (error, result) => {
     if (error) throw error;
-    res.send("User added successfully");
+    if (result.affectedRows > 0) {
+      res.send("User added successfully");
+    } else {
+      res.send("User already exists");
+    }
   });
-	db.end()
-
 });
+
+
 
 
 app.post('/user', async (req, res) => {
