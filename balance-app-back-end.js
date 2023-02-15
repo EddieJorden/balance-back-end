@@ -1,12 +1,12 @@
 const express = require("express");
 const cors = require("cors");
-
+const mysql = require("mysql");
 require('dotenv').config();
 const dbConfig = require("./config")
 
 
 const app = express();
-const port = 8888;
+const port = process.env.PORT || 8888;
 const HOST = "0.0.0.0";
 
 const userArray = [];
@@ -17,8 +17,6 @@ app.use(express.json())
 app.get("/", (res) => {
   res.send("Welcome to Balance App");
 });
-
-const mysql = require("mysql");
 
 const db = mysql.createConnection({
 	host: dbConfig.host,
@@ -37,7 +35,6 @@ db.connect((err) => {
 })
 
 app.post("/adduser", (req, res) => {
-  console.log(req.body)
   const username = req.body.username;
   const email = req.body.email;
   const addUserQuery = `
