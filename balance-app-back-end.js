@@ -22,7 +22,7 @@ const mysql = require("mysql");
 
 const db = mysql.createConnection({
 	host: dbConfig.host,
-	port: 3306,
+	port: dbConfig.port,
 	user: dbConfig.user,
 	password: dbConfig.password,
 	database: dbConfig.database,
