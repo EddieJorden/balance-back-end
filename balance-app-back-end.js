@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const pool = require("./database")
+
 require('dotenv').config();
+const dbConfig = require("./config")
 
 
 const app = express();
@@ -13,28 +14,100 @@ const userArray = [];
 app.use(cors());
 app.use(express.json())
 
-app.get("/", (req, res) => {
+app.get("/", (res) => {
   res.send("Welcome to Balance App");
 });
 
-//get a user 
+const mysql = require("mysql");
 
-//create a user
-app.post("/user", async(req, res) => {
-	try {
-		const { userName } = req.body;
-		const newUser = await pool.query("INSERT INTO userProfile (description) VALUES ($1) RETURNING *",
-		[userName]
-		);
-		res.json(newUser)
-	} catch (err) {
-		console.error({error: err.message})
-	}
+const db = mysql.createConnection({
+	host: dbConfig.host,
+	port: 3306,
+	user: dbConfig.user,
+	password: dbConfig.password,
+	database: dbConfig.database,
 })
 
-//update user
+db.connect((err) => {
+	if (err) {
+		console.log(err.message)
+		return;
+	}
+	console.log("database connected.")
+})
 
-//delete user
+app.post("/adduser", (req, res) => {
+  console.log(req.body)
+  const username = req.body.username;
+  const email = req.body.email;
+  const addUserQuery = `
+    INSERT INTO users (username, email)
+    SELECT * FROM (SELECT ?, ?) AS tmp
+    WHERE NOT EXISTS (
+        SELECT email FROM users WHERE email = ?
+    ) LIMIT 1;
+  `;
+
+  db.query(addUserQuery, [username, email, email], (error, result) => {
+    if (error) throw error;
+    if (result.affectedRows > 0) {
+      res.send({message: "User added successfully", user: {username, email}});
+    } else {
+      res.send({message: "User already exists", user: {username, email}});
+    }
+  });
+});
+
+
+
+
+
+app.post('/user', async (req, res) => {
+    try {
+        const { name, email, tasks, user_status } = req.body;
+        const result = await db.query(`INSERT INTO user_profiles (name, email, tasks, user_status) VALUES ($1, $2, $3, $4)`, [name, email, tasks, user_status]);
+				const check = await db.query(`SELECT * FROM user_profiles WHERE name = $1`, [name]);
+        console.log(check.rows);
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ status: 'error', message: err.message });
+    }
+});
+
+app.get('/user', async (req, res) => {
+  try {
+    const { name, email } = req.query;
+
+    const result = await db.query(`SELECT * FROM user_profiles WHERE name = $1 and email = $2`, [name, email]);
+    if (result.rows.length > 0) {
+      res.status(200).json(result.rows[0]);
+    } else {
+      res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
+
+app.patch('/user/task', async (req, res) => {
+  try {
+    const { name, email, task } = req.body;
+		const taskJson = JSON.stringify(task);
+		console.log('taskJson', taskJson)
+
+    const result = await db.query(`UPDATE user_profiles SET tasks = jsonb_set(tasks, '{task1}', to_jsonb($1), true) WHERE name = $2 and email = $3`, [taskJson, name, email]);
+    if (result.rowCount > 0) {
+      res.status(200).json({ status: 'success', message: 'Task added' });
+    } else {
+      res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
 
 //If name exists in users returns user profile else craetes new user and returns user profile.
 app.get("/getUserProfile", (req, res) => {
@@ -66,7 +139,6 @@ app.get("/getUserProfile", (req, res) => {
 
 	if(isNameValid && isEmailValid && requestedName !== "user name" && requestedEmail !== "mail@email.com") {
 			//if not found create new profile
-		// userArray.filter(profile => profile.userName === requestedName)
 
 	if(userArray.findIndex(item => 
 		item.userName.toUpperCase() === requestedName.toUpperCase() &&
@@ -120,8 +192,6 @@ app.post('/createNewTask', (req, res) => {
 				res.send('user not found')
 			}
 		})
-	} else {
-		// res.send('user not found')
 	}
 })
 
@@ -133,14 +203,12 @@ app.get('/fetch-chatgpt-response', (req, res) => {
 	const apiKey = process.env.API_KEY;
 
 	console.log(prompt)
-
   // Make a request to the chatgpt endpoint with the prompt
-	const apiKey = process.env.API_KEY;
-
   request.post('https://api.openai.com/v1/completions', {
     json: {
       prompt: prompt,
-			model: "text-davinci-003"
+			model: "text-davinci-003",
+			max_tokens: 2048
     },
     headers: {
       'Authorization': 'Bearer ' + apiKey
@@ -151,17 +219,12 @@ app.get('/fetch-chatgpt-response', (req, res) => {
       // Return an error response if there was a problem with the request
       res.status(500).send({ error: error });
     } else {
-			console.log('Response:', response);
       // Return the response from chatgpt
+			console.log('body', body)
       res.send(body);
     }
   });
 });
-
-// app.listen(3000, () => {
-//   console.log('Server listening on port 3000');
-// });
-
 
 app.listen(port, () => {
   console.log(`Balance App is listening at ${HOST} : ${port}`);
