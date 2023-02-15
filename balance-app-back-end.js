@@ -195,7 +195,6 @@ app.post('/createNewTask', (req, res) => {
 	}
 })
 
-// const express = require('express');
 const request = require('request');
 
 app.get('/fetch-chatgpt-response', (req, res) => {
