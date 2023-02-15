@@ -20,9 +20,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use(express.json())
+app.use(express.json());
 
-app.get("/", (res) => {
+app.get("/", (req,res) => {
   res.send("Welcome to Balance App");
 });
 
