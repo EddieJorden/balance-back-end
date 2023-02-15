@@ -37,7 +37,6 @@ db.connect((err) => {
 })
 
 app.post("/adduser", (req, res) => {
-  console.log(req.body)
   const username = req.body.username;
   const email = req.body.email;
   const addUserQuery = `
