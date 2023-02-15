@@ -11,7 +11,15 @@ const HOST = "0.0.0.0";
 
 const userArray = [];
 
-app.use(cors());
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.json())
 
 app.get("/", (res) => {
@@ -54,10 +62,6 @@ app.post("/adduser", (req, res) => {
     }
   });
 });
-
-
-
-
 
 app.post('/user', async (req, res) => {
     try {
