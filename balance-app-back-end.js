@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-
+const mysql = require("mysql");
 require('dotenv').config();
 const dbConfig = require("./config")
 
@@ -17,8 +17,6 @@ app.use(express.json())
 app.get("/", (res) => {
   res.send("Welcome to Balance App");
 });
-
-const mysql = require("mysql");
 
 const db = mysql.createConnection({
 	host: dbConfig.host,
