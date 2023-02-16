@@ -73,14 +73,29 @@ app.post('/users/:id/tasks', function(req, res) {
   const taskPriority = req.body.task_priority;
   const taskStatus = req.body.task_status;
   
-  // Insert the new task into the tasks table
-  db.query('INSERT INTO tasks (user_id, task_name, task_description, task_due_date, task_priority, task_status) VALUES (?, ?, ?, ?, ?, ?)',
-    [userId, taskName, taskDescription, taskDueDate, taskPriority, taskStatus],
-    function(error, results, fields) {
-      if (error) throw error;
-      res.send('Task added successfully!');
-    });
+  // Check if a task with the same name already exists for the user
+  db.query('SELECT * FROM tasks WHERE user_id = ? AND task_name = ?', [userId, taskName], function(error, results, fields) {
+    if (error) throw error;
+    if (results.length > 0) {
+      res.send('A task with the same name already exists for the user!');
+    } else {
+      // Insert the new task into the tasks table
+      db.query('INSERT INTO tasks (user_id, task_name, task_description, task_due_date, task_priority, task_status) VALUES (?, ?, ?, ?, ?, ?)',
+        [userId, taskName, taskDescription, taskDueDate, taskPriority, taskStatus],
+        function(error, results, fields) {
+          if (error) throw error;
+
+          // Get all tasks associated with the specified user
+          db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+            if (error) throw error;
+            res.send(results);
+          });
+        });
+    }
+  });
 });
+
+
 
 
 app.post('/user', async (req, res) => {
