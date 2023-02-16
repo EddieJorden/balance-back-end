@@ -3,7 +3,7 @@ const cors = require("cors");
 const mysql = require("mysql");
 require('dotenv').config();
 const dbConfig = require("./config")
-
+const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 8888;
@@ -21,6 +21,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req,res) => {
   res.send("Welcome to Balance App");
@@ -62,6 +64,24 @@ app.post("/adduser", (req, res) => {
     }
   });
 });
+
+app.post('/users/:id/tasks', function(req, res) {
+  const userId = req.params.id;
+  const taskName = req.body.task_name;
+  const taskDescription = req.body.task_description;
+  const taskDueDate = req.body.task_due_date;
+  const taskPriority = req.body.task_priority;
+  const taskStatus = req.body.task_status;
+  
+  // Insert the new task into the tasks table
+  db.query('INSERT INTO tasks (user_id, task_name, task_description, task_due_date, task_priority, task_status) VALUES (?, ?, ?, ?, ?, ?)',
+    [userId, taskName, taskDescription, taskDueDate, taskPriority, taskStatus],
+    function(error, results, fields) {
+      if (error) throw error;
+      res.send('Task added successfully!');
+    });
+});
+
 
 app.post('/user', async (req, res) => {
     try {
