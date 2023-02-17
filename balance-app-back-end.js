@@ -131,6 +131,23 @@ app.post('/users/:id/tasks/:task_id', function(req, res) {
 		});
 })
 
+// Delete a task
+app.post('/users/:id/tasks/:task_id/delete', function(req, res) {
+	const userId = req.params.id;
+	const taskId = req.params.task_id;
+
+	// Delete the task from the tasks table
+	db.query('DELETE FROM tasks WHERE id = ?', [taskId], function(error, results, fields) {
+		if (error) throw error;
+
+		// Get all tasks associated with the specified user
+		db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+			if (error) throw error;
+			res.send(results);
+		});
+	});
+});
+
 app.post('/user', async (req, res) => {
     try {
         const { name, email, tasks, user_status } = req.body;
