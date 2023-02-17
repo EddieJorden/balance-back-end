@@ -95,8 +95,15 @@ app.post('/users/:id/tasks', function(req, res) {
   });
 });
 
+app.get('/users/:id/tasks', function(req, res) {
+  const userId = req.params.id;
 
-
+  // Get all tasks associated with the specified user
+  db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+    if (error) throw error;
+    res.send(results);
+  });
+});
 
 app.post('/user', async (req, res) => {
     try {
