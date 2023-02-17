@@ -65,6 +65,7 @@ app.post("/adduser", (req, res) => {
   });
 });
 
+// Create new task
 app.post('/users/:id/tasks', function(req, res) {
   const userId = req.params.id;
   const taskName = req.body.task_name;
@@ -95,6 +96,7 @@ app.post('/users/:id/tasks', function(req, res) {
   });
 });
 
+// Get all tasks for a user
 app.get('/users/:id/tasks', function(req, res) {
   const userId = req.params.id;
 
@@ -105,6 +107,7 @@ app.get('/users/:id/tasks', function(req, res) {
   });
 });
 
+//Update a task
 app.post('/users/:id/tasks/:task_id', function(req, res) {
 	const userId = req.params.id;
 	const taskId = req.params.task_id;
