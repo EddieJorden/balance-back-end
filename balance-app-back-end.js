@@ -105,6 +105,29 @@ app.get('/users/:id/tasks', function(req, res) {
   });
 });
 
+app.post('/users/:id/tasks/:task_id', function(req, res) {
+	const userId = req.params.id;
+	const taskId = req.params.task_id;
+	const taskName = req.body.task_name;
+	const taskDescription = req.body.task_description;
+	const taskDueDate = req.body.task_due_date;
+	const taskPriority = req.body.task_priority;
+	const taskStatus = req.body.task_status;
+
+	// Update the task in the tasks table
+	db.query('UPDATE tasks SET task_name = ?, task_description = ?, task_due_date = ?, task_priority = ?, task_status = ? WHERE id = ?',
+		[taskName, taskDescription, taskDueDate, taskPriority, taskStatus, taskId],
+		function(error, results, fields) {
+			if (error) throw error;
+
+			// Get all tasks associated with the specified user
+			db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+				if (error) throw error;
+				res.send(results);
+			});
+		});
+})
+
 app.post('/user', async (req, res) => {
     try {
         const { name, email, tasks, user_status } = req.body;
