@@ -3,7 +3,7 @@ const cors = require("cors");
 const mysql = require("mysql");
 require('dotenv').config();
 const dbConfig = require("./config")
-
+const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 8888;
@@ -21,6 +21,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req,res) => {
   res.send("Welcome to Balance App");
@@ -61,6 +63,89 @@ app.post("/adduser", (req, res) => {
       res.send({message: "User already exists", user: {username, email}});
     }
   });
+});
+
+// Create new task
+app.post('/users/:id/tasks', function(req, res) {
+  const userId = req.params.id;
+  const taskName = req.body.task_name;
+  const taskDescription = req.body.task_description;
+  const taskDueDate = req.body.task_due_date;
+  const taskPriority = req.body.task_priority;
+  const taskStatus = req.body.task_status;
+  
+  // Check if a task with the same name already exists for the user
+  db.query('SELECT * FROM tasks WHERE user_id = ? AND task_name = ?', [userId, taskName], function(error, results, fields) {
+    if (error) throw error;
+    if (results.length > 0) {
+      res.send('A task with the same name already exists for the user!');
+    } else {
+      // Insert the new task into the tasks table
+      db.query('INSERT INTO tasks (user_id, task_name, task_description, task_due_date, task_priority, task_status) VALUES (?, ?, ?, ?, ?, ?)',
+        [userId, taskName, taskDescription, taskDueDate, taskPriority, taskStatus],
+        function(error, results, fields) {
+          if (error) throw error;
+
+          // Get all tasks associated with the specified user
+          db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+            if (error) throw error;
+            res.send(results);
+          });
+        });
+    }
+  });
+});
+
+// Get all tasks for a user
+app.get('/users/:id/tasks', function(req, res) {
+  const userId = req.params.id;
+
+  // Get all tasks associated with the specified user
+  db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+    if (error) throw error;
+    res.send(results);
+  });
+});
+
+//Update a task
+app.post('/users/:id/tasks/:task_id', function(req, res) {
+	const userId = req.params.id;
+	const taskId = req.params.task_id;
+	const taskName = req.body.task_name;
+	const taskDescription = req.body.task_description;
+	const taskDueDate = req.body.task_due_date;
+	const taskPriority = req.body.task_priority;
+	const taskStatus = req.body.task_status;
+
+	// Update the task in the tasks table
+	db.query('UPDATE tasks SET task_name = ?, task_description = ?, task_due_date = ?, task_priority = ?, task_status = ? WHERE id = ?',
+		[taskName, taskDescription, taskDueDate, taskPriority, taskStatus, taskId],
+		function(error, results, fields) {
+			if (error) throw error;
+
+			// Get all tasks associated with the specified user
+			db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+				if (error) throw error;
+				res.send(results);
+			});
+		});
+})
+
+// Delete a task
+app.post('/users/:id/tasks/:task_id/delete', function(req, res) {
+	const userId = req.params.id;
+	const taskId = req.params.task_id;
+
+	// Delete the task from the tasks table
+	db.query('DELETE FROM tasks WHERE id = ?', [taskId], function(error, results, fields) {
+		if (error) throw error;
+
+		// Get all tasks associated with the specified user
+		db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+			if (error) throw error;
+			res.send(results);
+		});
+	});
 });
 
 app.post('/user', async (req, res) => {
