@@ -108,7 +108,7 @@ app.get('/users/:id/tasks', function(req, res) {
 });
 
 //Update a task
-app.post('/users/:id/tasks/:task_id', function(req, res) {
+app.post('/users/:id/tasks/:task_id/update', function(req, res) {
 	const userId = req.params.id;
 	const taskId = req.params.task_id;
 	const taskName = req.body.task_name;
@@ -116,6 +116,7 @@ app.post('/users/:id/tasks/:task_id', function(req, res) {
 	const taskDueDate = req.body.task_due_date;
 	const taskPriority = req.body.task_priority;
 	const taskStatus = req.body.task_status;
+	console.log(req.body)
 
 	// Update the task in the tasks table
 	db.query('UPDATE tasks SET task_name = ?, task_description = ?, task_due_date = ?, task_priority = ?, task_status = ? WHERE id = ?',
@@ -123,13 +124,14 @@ app.post('/users/:id/tasks/:task_id', function(req, res) {
 		function(error, results, fields) {
 			if (error) throw error;
 
-			// Get all tasks associated with the specified user
-			db.query('SELECT * FROM tasks WHERE user_id = ?', [userId], function(error, results, fields) {
+			// Get the updated task
+			db.query('SELECT * FROM tasks WHERE id = ?', [taskId], function(error, results, fields) {
 				if (error) throw error;
-				res.send(results);
+				res.send(results[0]);
 			});
 		});
 })
+
 
 // Delete a task
 app.post('/users/:id/tasks/:task_id/delete', function(req, res) {
