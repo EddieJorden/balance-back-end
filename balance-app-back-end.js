@@ -44,26 +44,36 @@ db.connect((err) => {
 	console.log("database connected.")
 })
 
-app.post("/adduser", (req, res) => {
-  const username = req.body.username;
-  const email = req.body.email;
-  const addUserQuery = `
-    INSERT INTO users (username, email)
-    SELECT * FROM (SELECT ?, ?) AS tmp
-    WHERE NOT EXISTS (
-        SELECT email FROM users WHERE email = ?
-    ) LIMIT 1;
-  `;
+app.post('/adduser', function(req, res) {
+  var username = req.body.username;
+  var email = req.body.email;
 
-  db.query(addUserQuery, [username, email, email], (error, result) => {
-    if (error) throw error;
-    if (result.affectedRows > 0) {
-      res.send({message: "User added successfully", user: {username, email}});
-    } else {
-      res.send({message: "User already exists", user: {username, email}});
+  // First query - insert user if email does not already exist
+  db.query(
+    'INSERT INTO users (username, email) SELECT * FROM (SELECT ?, ?) AS tmp WHERE NOT EXISTS (SELECT email FROM users WHERE email = ?) LIMIT 1',
+    [username, email, email],
+    function(error, results, fields) {
+      if (error) {
+        throw error;
+      }
+
+      // Second query - select id, username, and email of user with specified email
+      db.query(
+        'SELECT id, username, email FROM users WHERE email = ?',
+        [email],
+        function(error, results, fields) {
+          if (error) {
+            throw error;
+          }
+
+          res.json(results[0]);
+        }
+      );
     }
-  });
+  );
 });
+
+
 
 // Create new task
 app.post('/users/:id/tasks', function(req, res) {
