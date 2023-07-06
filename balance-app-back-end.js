@@ -319,6 +319,57 @@ app.get('/fetch-chatgpt-response', (req, res) => {
   });
 });
 
+app.get('/fetch-finances-income', (req, res) => {
+	const hourlyWage1 = req.query.hourlyWage1;
+	const hourlyWage2 = req.query.hourlyWage2;
+	const hourlyWage3 = req.query.hourlyWage3;
+	const hourlyWage4 = req.query.hourlyWage4;
+	const overtimeHours1 = req.query.overtimeHours1;
+	const overtimeHours2 = req.query.overtimeHours2;
+	const overtimeHours3 = req.query.overtimeHours3;
+	const overtimeHours4 = req.query.overtimeHours4;
+	const filingStatus = req.query.filingStatus;
+
+	const totalRegularHours = hourlyWage1 + hourlyWage2 + hourlyWage3 + hourlyWage4;
+
+	const totalOvertimeHours = overtimeHours1 + overtimeHours2 + overtimeHours3 + overtimeHours4;
+
+	// const totalPay = totalRegularHours + totalOvertimeHours;
+	const totalPay = 72000
+
+	const totalIncomeAfterTaxes = () => {
+		let taxs;
+
+		if(totalPay > 0 && totalPay < 10275) {
+			taxs = totalPay * .10
+		}
+		if(totalPay > 10276 && totalPay < 41775) {
+			taxs = ((totalPay - 10275) * .12) + 1027.5
+		}
+		if(totalPay > 41776 && totalPay < 89075) {
+			taxs = ((totalPay - 41775) * .22) + 4807.5
+		}
+		if(totalPay > 89076 && totalPay < 170050) {
+			taxs = ((totalPay - 89075) * .24) + 15213.5
+		}
+		if(totalPay > 170051 && totalPay < 215950) {
+			taxs = ((totalPay - 170050) * .32) + 34647.5
+		}
+		if(totalPay > 215951 && totalPay < 539900) {
+			taxs = ((totalPay - 215950) * .35) + 49335.5
+		}
+		if(totalPay > 539901) {
+			taxs = ((totalPay - 539900) * .37) + 162718
+		}
+		return totalPay - taxs
+	}
+
+	console.log(totalIncomeAfterTaxes())
+	
+	res.send('here is the stuff bro')
+})
+
+
 app.listen(port, () => {
   console.log(`Balance App is listening at ${HOST} : ${port}`);
 });
