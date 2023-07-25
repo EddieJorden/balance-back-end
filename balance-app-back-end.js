@@ -374,22 +374,19 @@ app.post('/fetch-finances-income', (req, res) => {
 	//array passed in where each index is the different rate of pay per job
 	const hoursPerJobArray = req.body.hoursPerJobArray;
 	const hourlyRatesPerJobArray = req.body.hourlyRatesArray;
-	console.log(hoursPerJobArray, hourlyRatesPerJobArray)
+	// console.log(hoursPerJobArray, hourlyRatesPerJobArray)
 	
 
 	//array passed in where each index is the number of hours paid overtime matching the index of the hourlyRatesArray
 	const overtimeHoursArray = req.query.overtimeHoursArray;
-	const overtimeHours1 = req.query.overtimeHours1;
-	const overtimeHours2 = req.query.overtimeHours2;
-	const overtimeHours3 = req.query.overtimeHours3;
-	const overtimeHours4 = req.query.overtimeHours4;
 	const filingStatus = req.query.filingStatus;
 
-	const totalIncomeAfterTaxes = () => {
-		let totalPayBeforeTaxes = 0;
+	const totalAnnualIncomeAfterTaxes = () => {
+		let totalWeeklyPayBeforeTaxes = 0;
+		let totalAnnualPayBeforeTaxes = 0;
 		let taxes;
 
-		function calculateTotalPayBeforeTaxes() {
+		function calculateTotalAnnualPayBeforeTaxes() {
 			//for each job in hoursPerJobArray
 			//multiply the hours from the matching index in the hourlyRatesPerJobArray
 			if(hoursPerJobArray.length <= 0) {
@@ -399,39 +396,47 @@ app.post('/fetch-finances-income', (req, res) => {
 			if(hourlyRatesPerJobArray.length <= 0) {
 				console.log('no hourly rate entered')
 				res.send('no hourly rate entered')
+			}
+			if(hourlyRatesPerJobArray.length !== hoursPerJobArray.length) {
+				res.send('missing information')
 			} else {
-				hoursPerJobArray.forEach((eachJob, index) => {
-					totalPayBeforeTaxes = totalPayBeforeTaxes + eachJob * hourlyRatesPerJobArray[index]
+				hourlyRatesPerJobArray.forEach((eachJob, index) => {
+					totalWeeklyPayBeforeTaxes +=  eachJob * hoursPerJobArray[index]
+					// console.log(`job ${index}: pay ${eachJob} hours ${hoursPerJobArray[index]} = ${totalWeeklyPayBeforeTaxes}`)
 				})
+				totalAnnualPayBeforeTaxes = (totalWeeklyPayBeforeTaxes * 4) * 12
 			}
 		}
-		calculateTotalPayBeforeTaxes()
+		calculateTotalAnnualPayBeforeTaxes()
+		if(totalAnnualPayBeforeTaxes <= 0) {
+			res.send('payment info missing')
+		}
 
-		if (totalPayBeforeTaxes > 0 && totalPayBeforeTaxes < 10275) {
-			taxes = totalPayBeforeTaxes * 0.1;
+		if (totalAnnualPayBeforeTaxes > 0 && totalAnnualPayBeforeTaxes < 10275) {
+			taxes = totalAnnualPayBeforeTaxes * 0.1;
 		}
-		if (totalPayBeforeTaxes > 10276 && totalPayBeforeTaxes < 41775) {
-			taxes = (totalPayBeforeTaxes - 10275) * 0.12 + 1027.5;
+		if (totalAnnualPayBeforeTaxes > 10276 && totalAnnualPayBeforeTaxes < 41775) {
+			taxes = (totalAnnualPayBeforeTaxes - 10275) * 0.12 + 1027.5;
 		}
-		if (totalPayBeforeTaxes > 41776 && totalPayBeforeTaxes < 89075) {
-			taxes = (totalPayBeforeTaxes - 41775) * 0.22 + 4807.5;
+		if (totalAnnualPayBeforeTaxes > 41776 && totalAnnualPayBeforeTaxes < 89075) {
+			taxes = (totalAnnualPayBeforeTaxes - 41775) * 0.22 + 4807.5;
 		}
-		if (totalPayBeforeTaxes > 89076 && totalPayBeforeTaxes < 170050) {
-			taxes = (totalPayBeforeTaxes - 89075) * 0.24 + 15213.5;
+		if (totalAnnualPayBeforeTaxes > 89076 && totalAnnualPayBeforeTaxes < 170050) {
+			taxes = (totalAnnualPayBeforeTaxes - 89075) * 0.24 + 15213.5;
 		}
-		if (totalPayBeforeTaxes > 170051 && totalPayBeforeTaxes < 215950) {
-			taxes = (totalPayBeforeTaxes - 170050) * 0.32 + 34647.5;
+		if (totalAnnualPayBeforeTaxes > 170051 && totalAnnualPayBeforeTaxes < 215950) {
+			taxes = (totalAnnualPayBeforeTaxes - 170050) * 0.32 + 34647.5;
 		}
-		if (totalPayBeforeTaxes > 215951 && totalPayBeforeTaxes < 539900) {
-			taxes = (totalPayBeforeTaxes - 215950) * 0.35 + 49335.5;
+		if (totalAnnualPayBeforeTaxes > 215951 && totalAnnualPayBeforeTaxes < 539900) {
+			taxes = (totalAnnualPayBeforeTaxes - 215950) * 0.35 + 49335.5;
 		}
-		if (totalPayBeforeTaxes > 539901) {
-			taxes = (totalPayBeforeTaxes - 539900) * 0.37 + 162718;
+		if (totalAnnualPayBeforeTaxes > 539901) {
+			taxes = (totalAnnualPayBeforeTaxes - 539900) * 0.37 + 162718;
 		}
-		return totalPayBeforeTaxes - taxes;
+		return totalAnnualPayBeforeTaxes - taxes;
 	};
 
-	res.send(`your total income after taxes is $${totalIncomeAfterTaxes()}`);
+	res.send(`your total annual income after taxes is $${totalAnnualIncomeAfterTaxes()}, Your two week paycheck after taxes should be ${(totalAnnualIncomeAfterTaxes() / 52) * 2}`);
 });
 
 app.listen(port, () => {
